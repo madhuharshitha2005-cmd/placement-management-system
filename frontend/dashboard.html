@@ -1,94 +1,197 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Management Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<div class="dashboard-container">
 
-    <h1>🎓 Placement Dashboard</h1>
+    <!-- TOP NAVBAR -->
+    <header class="navbar">
+        <div class="brand">
+            <span>🎓</span>
+            <div>Placement Management Portal</div>
+        </div>
+        <div class="nav-actions">
+            <span id="userDisplay" class="user-badge">👤 Admin</span>
+            <button onclick="toggleDarkMode()" class="darkbtn" title="Toggle Dark/Light Mode">🌙</button>
+            <button onclick="logout()" class="btn-logout" title="Sign out of portal">Logout</button>
+        </div>
+    </header>
 
-    <!-- ADD STUDENT -->
-    <div class="form-box">
-        <h2>Add Student</h2>
-
-        <input id="name" placeholder="Name">
-        <input id="email" placeholder="Email">
-        <input id="branch" placeholder="Branch">
-        <input id="cgpa" placeholder="CGPA">
-        <input type="file" id="resume" accept=".pdf,.doc,.docx">
-
-        <div class="btn-group">
-            <button onclick="addStudent()">Save</button>
-            <button onclick="logout()" class="logout">Logout</button>
-            <button onclick="toggleDarkMode()" class="darkbtn">🌙</button>
+    <!-- KEY STATS CARDS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon icon-blue">👨‍🎓</div>
+            <div class="stat-info">
+                <h3 id="totalStudentsCount">0</h3>
+                <p>Total Students</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-green">💼</div>
+            <div class="stat-info">
+                <h3 id="placedStudentsCount">0</h3>
+                <p>Placed Students</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-amber">⏳</div>
+            <div class="stat-info">
+                <h3 id="pendingStudentsCount">0</h3>
+                <p>Pending Placements</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-purple">🏢</div>
+            <div class="stat-info">
+                <h3 id="totalCompaniesCount">0</h3>
+                <p>Partner Companies</p>
+            </div>
         </div>
     </div>
 
-    <!-- STUDENT TABLE -->
-    <div class="table-box">
-        <h2>Student List</h2>
+    <!-- STUDENT SECTION -->
+    <div class="section-grid">
+        <!-- ADD STUDENT FORM -->
+        <div class="form-box">
+            <h2>➕ Add New Student</h2>
 
-        <select id="filterStatus" onchange="loadStudents()" class="filter">
-            <option value="all">All Students</option>
-            <option value="placed">Placed</option>
-            <option value="notPlaced">Not Placed</option>
-        </select>
+            <form onsubmit="event.preventDefault(); addStudent();">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input id="name" placeholder="e.g. Alex Johnson" required>
+                </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Branch</th>
-                    <th>CGPA</th>
-                    <th>Action</th>
-                    <th>Placement</th>
-                    <th>Recommend</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="studentTable"></tbody>
-        </table>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input id="email" type="email" placeholder="e.g. alex@university.edu" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="branch">Branch / Department</label>
+                    <input id="branch" placeholder="e.g. Computer Science" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cgpa">CGPA (0.0 - 10.0)</label>
+                    <input id="cgpa" type="number" step="0.1" min="0" max="10" placeholder="e.g. 8.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="resume">Upload Resume (PDF, DOCX)</label>
+                    <input type="file" id="resume" accept=".pdf,.doc,.docx">
+                </div>
+
+                <button type="submit">Save Student Record</button>
+            </form>
+        </div>
+
+        <!-- STUDENT TABLE -->
+        <div class="table-box">
+            <div class="table-header-row">
+                <h2>📋 Registered Students</h2>
+                <div class="table-controls">
+                    <input type="text" id="studentSearch" class="search-input" placeholder="🔍 Search student, branch..." oninput="renderStudents()">
+                    <select id="filterStatus" onchange="renderStudents()" class="filter-select">
+                        <option value="all">All Students</option>
+                        <option value="placed">✔ Placed</option>
+                        <option value="notPlaced">⏳ Pending</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Branch</th>
+                            <th>CGPA</th>
+                            <th>Resume</th>
+                            <th>Career Match</th>
+                            <th>Status</th>
+                            <th>Placement Drive</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTable">
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 20px; color: var(--text-muted);">Loading students...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <!-- ✅ COMPANY BELOW STUDENT LIST -->
-    <div class="form-box">
-        <h2>Add Company</h2>
+    <!-- COMPANY SECTION -->
+    <div class="section-grid">
+        <!-- ADD COMPANY FORM -->
+        <div class="form-box">
+            <h2>🏢 Add Partner Company</h2>
 
-        <input id="cname" placeholder="Company Name">
-        <input id="role" placeholder="Role">
-        <input id="package" placeholder="Package">
+            <form onsubmit="event.preventDefault(); addCompany();">
+                <div class="form-group">
+                    <label for="cname">Company Name</label>
+                    <input id="cname" placeholder="e.g. Google, Microsoft" required>
+                </div>
 
-        <button onclick="addCompany()">Add Company</button>
-    </div>
+                <div class="form-group">
+                    <label for="role">Hiring Role</label>
+                    <input id="role" placeholder="e.g. Software Engineer" required>
+                </div>
 
-    <div class="table-box">
-        <h2>Company List</h2>
+                <div class="form-group">
+                    <label for="package">Salary Package</label>
+                    <input id="package" placeholder="e.g. 14 LPA" required>
+                </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Package</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="companyTable"></tbody>
-        </table>
+                <button type="submit">Register Company</button>
+            </form>
+        </div>
+
+        <!-- COMPANY TABLE -->
+        <div class="table-box">
+            <div class="table-header-row">
+                <h2>🤝 Recruitment Partners</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Company Name</th>
+                            <th>Job Role</th>
+                            <th>Annual Package</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companyTable">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-muted);">Loading partner companies...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 </div>
 
-<!-- POPUP -->
+<!-- NOTIFICATION & RECOMMENDATION POPUP -->
 <div id="popup" class="popup">
     <div class="popup-content">
-        <h3 id="popupTitle"></h3>
-        <p id="popupText"></p>
-        <button onclick="closePopup()">OK</button>
+        <h3 id="popupTitle">Notification</h3>
+        <div id="popupText">Message goes here</div>
+        <div style="margin-top: 20px;">
+            <button onclick="closePopup()">Close</button>
+        </div>
     </div>
 </div>
 

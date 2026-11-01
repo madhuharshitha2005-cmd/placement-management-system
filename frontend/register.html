@@ -1,25 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Placement Management System</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
-<body>
+<body class="auth-page">
 
 <div class="center-box">
-    <h2>Register</h2>
+    <div style="font-size: 40px; margin-bottom: 10px;">📝</div>
+    <h2>Create Account</h2>
+    <p>Register as a new placement administrator</p>
 
-    <input type="text" id="regUsername" placeholder="Username">
-    <input type="password" id="regPassword" placeholder="Password">
+    <form onsubmit="event.preventDefault(); register();">
+        <input type="text" id="regUsername" placeholder="Choose a Username (min 3 chars)" required autocomplete="username">
+        <input type="password" id="regPassword" placeholder="Create a Password" required autocomplete="new-password">
+        <button type="submit">Create Account</button>
+    </form>
 
-    <button onclick="register()">Register</button>
-
-    <p>Already have account?</p>
-    <a href="login.html">Login</a>
+    <div class="footer-link">
+        <span>Already have an account? </span>
+        <a href="login.html">Sign in here</a>
+    </div>
 </div>
 
-<!-- POPUP -->
+<!-- POPUP MODAL -->
 <div id="popup" class="popup">
     <div class="popup-content">
         <h3 id="popupTitle"></h3>
